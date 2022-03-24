@@ -1,0 +1,63 @@
+Step 1: If you have access, visit physics Box folder to get AIS .mat files, copy to ais folder
+Step 2: If you have access, copy corresponding physics acoustic data from hamming/cluster at 
+        group/mbari/data to a data folder
+Step 3: Create environment using requirements.txt
+Step 4: Run the following commands to install the wavcrawler tools
+        pip install -e resources/vs_db_maintainer/
+        pip install -e resources/vs_data_query/
+        pip install -e resources/sqlite_resources/
+        pip install -e resources/data_types/
+Step 5: Navigate to the folder containing the audio data to initialize the database with the following commands
+        This creates an SQLITE database for the wavcrawler package to access
+        fresh-db .
+        update-db .
+Step 6: Run 
+        "main_pipeline.py  --length --output_data --ais_folder --audio_folder --output_folder --channels --label_range --sample_rate"
+        to generate a new dataset, this script will skip audio data without 
+        corresponding .mat files, since there aren't .mat files for every day
+
+        Dataset Options:
+        A dataset can be generated with the following options:
+            length: (e.g. 30) number of seconds to generate the audio for, each labeled audio will correspond to this number
+            output_data: 'raw', 'calibrated', 'mel', 'calibrated-mel' this will output either raw audio data, 
+                    calibrated audio data, or the mel spectrogram of the audio data
+            ais_folder: file path containing ais .mat files
+            audio_folder: file path containing audio data and database
+            output_folder: file path for desired data output
+            channels: number of channels to have in the resulting dataset
+            label_range: Range in kilometers to count as true labels for ships
+            sample_rate: Desired sample rate to downsample to, must be less than or equal to 8000
+            
+
+
+Here are some examples of ways to get an interactive session on a GPU node from the submit node:
+
+srun --pty  --partition=beards  --gres=gpu:titanrtx    /bin/bash   # if you want a Titan RTX
+
+srun --pty  --partition=beards  --gres=gpu:1080    /bin/bash   # if you want a 1080 Ti
+
+srun --pty  --partition=beards  --gres=gpu    /bin/bash   # if you’re not picky
+
+srun --pty  --partition=beards  --gres=gpu:2    /bin/bash   # if you need more than 1 GPU
+
+srun --pty  --partition=beards  --gres=gpu:titanrtx:3    /bin/bash   # if you need 3 Titan RTX
+
+ 
+
+If you’re going to write a script for a batch job, you would just need to include directives in the script that looks something like
+
+#SBATCH --gres=gpu:titanrtx:1
+
+#SBATCH --partition=beards
+
+
+module load lang/miniconda3/4.5.12
+
+data/beards/CS4321/acoustic_datasets/
+
+
+to run in background
+./example_generate_dataset.sh > output.txt &
+
+To view output from file
+tail -f output.txt
